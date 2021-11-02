@@ -122,7 +122,21 @@ func BenchmarkNow(b *testing.B) {
 			b.Log("time is zero")
 		}
 	})
-	b.Run("reuse-epoch", func(b *testing.B) {
+	b.Run("reuse-time", func(b *testing.B) {
+		// make a benchmark in where compiler
+		// optimizations do not remove our variable
+		b.ReportAllocs()
+		b.SetBytes(1)
+		b.ResetTimer()
+		var ep time.Time
+		for i := 0; i < b.N; i++ {
+			ep = ReuseTime()
+		}
+		if ep.Unix() == 0 {
+			b.Log("time is zero")
+		}
+	})
+	b.Run("reuse-unix", func(b *testing.B) {
 		// make a benchmark in where compiler
 		// optimizations do not remove our variable
 		b.ReportAllocs()
@@ -130,7 +144,35 @@ func BenchmarkNow(b *testing.B) {
 		b.ResetTimer()
 		var ep int64
 		for i := 0; i < b.N; i++ {
-			ep = ReuseEpoch()
+			ep = ReuseUnix()
+		}
+		if ep == 0 {
+			b.Log("time is zero")
+		}
+	})
+	b.Run("reuse-unixnano", func(b *testing.B) {
+		// make a benchmark in where compiler
+		// optimizations do not remove our variable
+		b.ReportAllocs()
+		b.SetBytes(1)
+		b.ResetTimer()
+		var ep int64
+		for i := 0; i < b.N; i++ {
+			ep = ReuseUnixNano()
+		}
+		if ep == 0 {
+			b.Log("time is zero")
+		}
+	})
+	b.Run("reuse-time-unixnano", func(b *testing.B) {
+		// make a benchmark in where compiler
+		// optimizations do not remove our variable
+		b.ReportAllocs()
+		b.SetBytes(1)
+		b.ResetTimer()
+		var ep int64
+		for i := 0; i < b.N; i++ {
+			ep = ReuseTime().UnixNano()
 		}
 		if ep == 0 {
 			b.Log("time is zero")
