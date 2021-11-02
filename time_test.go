@@ -1,10 +1,10 @@
-// 
+//
 // Created by zerjioang
 // https://github/zerjioang
 // Copyright (c) 2020. All rights reserved.
-// 
+//
 // SPDX-License-Identifier: GPL-3.0
-// 
+//
 
 package time32
 
@@ -42,6 +42,14 @@ func TestNow(t *testing.T) {
 		tt := time.Now().Unix()
 		t.Log(binary.Size(tt))
 		t.Log(tt)
+	})
+	t.Run("both-epoch", func(t *testing.T) {
+		tt := time.Now().Unix()
+		t.Log(binary.Size(tt))
+		t.Log(tt)
+		t2 := Epoch()
+		t.Log(binary.Size(t2))
+		t.Log(t2)
 	})
 }
 
@@ -97,7 +105,7 @@ func BenchmarkNow(b *testing.B) {
 			tt = Now()
 		}
 		if tt.IsZero() {
-
+			b.Log("time is zero")
 		}
 	})
 	b.Run("standard-go-time-ref", func(b *testing.B) {
@@ -111,7 +119,21 @@ func BenchmarkNow(b *testing.B) {
 			tt = time.Now()
 		}
 		if tt.IsZero() {
-
+			b.Log("time is zero")
+		}
+	})
+	b.Run("reuse-epoch", func(b *testing.B) {
+		// make a benchmark in where compiler
+		// optimizations do not remove our variable
+		b.ReportAllocs()
+		b.SetBytes(1)
+		b.ResetTimer()
+		var ep int64
+		for i := 0; i < b.N; i++ {
+			ep = ReuseEpoch()
+		}
+		if ep == 0 {
+			b.Log("time is zero")
 		}
 	})
 }
